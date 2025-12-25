@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+// Note: These paths must match where you placed the files
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 
 function App() {
-  // MOCK AUTH STATE: Change this to true/false to test different views
-  // For today, the Login button will simply set this to true.
   const [session, setSession] = useState(false);
-
-  const handleMockLogin = () => {
-    setSession(true); // Pretend we logged in
-  };
-
-  const handleMockLogout = () => {
-    setSession(false); // Pretend we logged out
-  };
 
   return (
     <BrowserRouter>
@@ -23,7 +15,7 @@ function App() {
           path="/"
           element={
             !session ? (
-              <Auth onLogin={handleMockLogin} />
+              <Auth onLogin={() => setSession(true)} />
             ) : (
               <Navigate to="/dashboard" />
             )
@@ -33,7 +25,7 @@ function App() {
           path="/dashboard"
           element={
             session ? (
-              <Dashboard onLogout={handleMockLogout} />
+              <Dashboard onLogout={() => setSession(false)} />
             ) : (
               <Navigate to="/" />
             )
