@@ -1,91 +1,96 @@
 import { useState } from "react";
 
-export default function Dashboard({ onLogout }) {
-  const [soreness, setSoreness] = useState(5);
-
-  // DUMMY DATA FOR UI TESTING
-  const recentLogs = [
-    { id: 1, date: "2023-12-24", activity: "5k Run", rpe: 8, load: 450 },
-    { id: 2, date: "2023-12-22", activity: "Leg Day", rpe: 6, load: 300 },
-  ];
-
-  const riskScore = soreness > 7 ? "High" : "Low";
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState("Overview");
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <nav className="bg-white shadow-sm p-4 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-600">ProActive</h1>
-          <button
-            onClick={onLogout}
-            className="text-sm text-gray-500 hover:text-red-500"
-          >
-            Sign Out
-          </button>
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar - Glass Effect */}
+      <aside className="w-64 bg-black/20 backdrop-blur-xl border-r border-white/10 flex-col hidden md:flex">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-white tracking-tight">
+            ProActive
+          </h2>
         </div>
-      </nav>
 
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
-        {/* Readiness Check UI */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-gray-800">⚡ Readiness Check</h3>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-bold ${
-                riskScore === "High"
-                  ? "bg-red-100 text-red-600"
-                  : "bg-green-100 text-green-600"
+        <nav className="flex-1 px-4 space-y-2">
+          {["Overview", "Workouts", "Recovery", "Settings"].map((item) => (
+            <button
+              key={item}
+              onClick={() => setActiveTab(item)}
+              className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                activeTab === item
+                  ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+                  : "text-gray-400 hover:bg-white/5 hover:text-white"
               }`}
             >
-              Risk: {riskScore}
-            </span>
-          </div>
-          <p className="text-sm text-gray-500 mb-4">
-            How sore are you feeling right now?
-          </p>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            value={soreness}
-            onChange={(e) => setSoreness(e.target.value)}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-          />
-          <div className="mt-4 bg-gray-50 p-3 rounded-lg text-sm text-gray-600 border border-gray-200">
-            {soreness > 7
-              ? "⚠️ High soreness detected. Recovery advised."
-              : "✅ Good to go!"}
-          </div>
-        </div>
+              {item}
+            </button>
+          ))}
+        </nav>
 
-        {/* Recent Logs UI */}
-        <div>
-          <h3 className="font-bold text-gray-800 mb-3 px-1">Recent Activity</h3>
-          <div className="space-y-3">
-            {recentLogs.map((log) => (
-              <div
-                key={log.id}
-                className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center"
-              >
-                <div>
-                  <h4 className="font-semibold text-gray-800">
-                    {log.activity}
-                  </h4>
-                  <p className="text-xs text-gray-500">
-                    {log.date} • RPE: {log.rpe}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="block font-bold text-blue-600">
-                    {log.load}
-                  </span>
-                  <span className="text-[10px] text-gray-400">LOAD</span>
-                </div>
-              </div>
-            ))}
+        <div className="p-4">
+          <div className="bg-gradient-to-br from-purple-600/20 to-blue-600/20 rounded-xl p-4 border border-white/10">
+            <h4 className="text-sm font-semibold text-white">Pro Plan</h4>
+            <p className="text-xs text-gray-400 mt-1">
+              Upgrade for AI insights
+            </p>
           </div>
         </div>
-      </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto p-8 relative">
+        <header className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white">{activeTab}</h1>
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 border-2 border-white/20"></div>
+          </div>
+        </header>
+
+        {/* Dashboard Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Card 1: Readiness Score */}
+          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition">
+            <h3 className="text-gray-400 text-sm font-medium uppercase">
+              Readiness Score
+            </h3>
+            <div className="mt-4 flex items-end gap-2">
+              <span className="text-5xl font-bold text-green-400">85</span>
+              <span className="text-sm text-gray-400 mb-2">/ 100</span>
+            </div>
+            <div className="mt-4 h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-green-400 w-[85%]"></div>
+            </div>
+          </div>
+
+          {/* Card 2: Training Load */}
+          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition">
+            <h3 className="text-gray-400 text-sm font-medium uppercase">
+              Acute Load
+            </h3>
+            <div className="mt-4 flex items-end gap-2">
+              <span className="text-5xl font-bold text-blue-400">Low</span>
+            </div>
+            <p className="text-sm text-gray-400 mt-2">
+              Optimal range for recovery.
+            </p>
+          </div>
+
+          {/* Card 3: Injury Risk */}
+          <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition">
+            <h3 className="text-gray-400 text-sm font-medium uppercase">
+              Injury Risk
+            </h3>
+            <div className="mt-4 flex items-end gap-2">
+              <span className="text-5xl font-bold text-red-400">12%</span>
+            </div>
+            <p className="text-sm text-gray-400 mt-2">
+              Knee stability is low today.
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
