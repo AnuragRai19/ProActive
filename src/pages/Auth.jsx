@@ -1,114 +1,92 @@
 import { useState } from "react";
-import { supabase } from "../supabaseClient"; // Import the connection we just made
+import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom"; // <--- 1. Import this
 
-export default function Auth({ onLogin }) {
-  const [isSignUp, setIsSignUp] = useState(false);
+export default function Auth() {
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // To show a spinner
-  const [errorMsg, setErrorMsg] = useState(""); // To show errors
+  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate(); // <--- 2. Turn on the navigation tool
 
-  const handleAuth = async () => {
+  const handleAuth = async (e) => {
+    e.preventDefault();
     setLoading(true);
-    setErrorMsg("");
 
-    try {
-      if (isSignUp) {
-        // 1. Create a new user in Supabase
-        const { error } = await supabase.auth.signUp({
-          email: email,
-          password: password,
-        });
-        if (error) throw error;
-        alert("Check your email for the confirmation link!");
-      } else {
-        // 2. Log in existing user
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password,
-        });
-        if (error) throw error;
-        onLogin(); // Tell App.jsx that we are logged in
-      }
-    } catch (error) {
-      setErrorMsg(error.message);
-    } finally {
-      setLoading(false);
+    let result;
+
+    if (isLogin) {
+      result = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+    } else {
+      result = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: email.split("@")[0], // Simple default name
+          },
+        },
+      });
     }
+
+    const { error } = result;
+
+    if (error) {
+      alert(error.message);
+    } else {
+      // <--- 3. THE FIX: Don't call onLogin, just go to Dashboard!
+      navigate("/dashboard");
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-gray-900 via-gray-800 to-black"></div>
-      <div className="absolute -top-20 -left-20 w-96 h-96 bg-blue-600/30 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl"></div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-96">
+        <h1 className="text-3xl font-bold mb-6 text-center text-blue-400">
+          ProActive
+        </h1>
+        <p className="text-gray-400 mb-6 text-center">
+          {isLogin ? "Sign in to your account" : "Create a new account"}
+        </p>
 
-      {/* Glass Card */}
-      <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 shadow-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
-            ProActive
-          </h1>
-          <p className="text-blue-200 text-sm uppercase tracking-widest">
-            Athlete Intelligence
-          </p>
-        </div>
-
-        {errorMsg && (
-          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm text-center">
-            {errorMsg}
-          </div>
-        )}
-
-        <div className="space-y-5">
-          <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1 uppercase tracking-wider">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
-              placeholder="athlete@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1 uppercase tracking-wider">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
-              placeholder="••••••••"
-            />
-          </div>
-
+        <form onSubmit={handleAuth} className="flex flex-col gap-4">
+          <input
+            type="email"
+            placeholder="Email"
+            className="p-3 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="p-3 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:border-blue-500"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <button
-            onClick={handleAuth}
+            type="submit"
             disabled={loading}
-            className="w-full bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-500/30 transition transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-600 p-3 rounded font-bold hover:bg-blue-500 transition disabled:opacity-50"
           >
-            {loading
-              ? "Processing..."
-              : isSignUp
-              ? "Create Account"
-              : "Sign In"}
+            {loading ? "Processing..." : isLogin ? "Sign In" : "Sign Up"}
           </button>
-        </div>
+        </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
           <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-sm text-gray-400 hover:text-white transition"
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-sm text-blue-300 hover:underline"
           >
-            {isSignUp
-              ? "Already have an account? Sign In"
-              : "New user? Sign Up"}
+            {isLogin
+              ? "Need an account? Sign Up"
+              : "Already have an account? Sign In"}
           </button>
         </div>
       </div>

@@ -1,38 +1,21 @@
-import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-// Note: These paths must match where you placed the files
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import LogWorkout from "./pages/LogWorkout";
+import History from "./pages/History"; // <--- 1. Import the new file
 
 function App() {
-  const [session, setSession] = useState(false);
-
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            !session ? (
-              <Auth onLogin={() => setSession(true)} />
-            ) : (
-              <Navigate to="/dashboard" />
-            )
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            session ? (
-              <Dashboard onLogout={() => setSession(false)} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
+        <Route path="/" element={<Auth />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/log-workout" element={<LogWorkout />} />
+
+        {/* 2. Use the new Component here */}
+        <Route path="/history" element={<History />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
