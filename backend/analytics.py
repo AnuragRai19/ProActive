@@ -48,6 +48,8 @@ def calculate_acwr(logs):
     else:
         ratio = round(acute_load / chronic_avg, 2)
 
+    # ... (Previous imports and code remain the same)
+
     # 7. Determine Status
     if ratio == 0:
         status = "No Recent Training"
@@ -60,10 +62,24 @@ def calculate_acwr(logs):
     else:
         status = "DANGER ZONE (High Injury Risk)"
 
+    # --- 🛡️ NEW: THE NEW USER GUARDRAIL ---
+    # If the user has very little history, the ratio is mathematically meaningless.
+    # We check if Chronic Load is suspiciously low compared to Acute Load.
+    
+    # Logic: If you just started, your chronic load will be tiny. 
+    # If chronic load is less than 20% of acute load, it means you are new.
+    if chronic_avg > 0 and (acute_load / chronic_avg) > 2.0:
+         status = "Calibrating System ⚙️" 
+         # Or: "Building History (Safe)"
+    
+    # Alternative: If you simply want to check the count of logs
+    # if len(df) < 5:
+    #    status = "Calibrating System ⚙️"
+
     return {
         "acute_load": int(acute_load),
         "chronic_load": int(chronic_avg),
         "acwr": ratio,
         "status": status,
-        "weekly_count": weekly_count 
+        "weekly_count": weekly_count
     }
