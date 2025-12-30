@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import { api } from "../services/api";
+import Card from "../components/Card";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -35,10 +37,8 @@ export default function Dashboard() {
 
       // Call Python Backend
       try {
-        const response = await fetch(
-          `http://127.0.0.1:8000/analytics/${user.id}`
-        );
-        const data = await response.json();
+        const data = await api.getAnalytics(user.id);
+
         setAnalytics(data);
       } catch (error) {
         console.error("Failed to fetch analytics:", error);
@@ -100,8 +100,8 @@ export default function Dashboard() {
         </div>
 
         {/* 1. HERO CARD: ACWR Injury Risk */}
-        <div className="grid grid-cols-1 gap-6 mb-8">
-          <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-700 text-center">
+        <div className="mb-8">
+          <Card className="text-center">
             <h2 className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-4">
               Injury Risk (ACWR)
             </h2>
@@ -125,17 +125,17 @@ export default function Dashboard() {
               <span className="text-white">{analytics.acute_load || 0}</span>{" "}
               (Last 7 Days)
             </p>
-          </div>
+          </Card>
         </div>
 
-        {/* 2. READINESS CHECK-IN (NEW SECTION) */}
+        {/* 2. READINESS CHECK-IN (Fixed) */}
         <div className="mb-8">
-          <div className="bg-linear-to-r from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700 shadow-lg">
+          <Card className="bg-linear-to-r from-gray-800 to-gray-900">
+            {/* Header & Button */}
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-gray-400 text-sm font-bold uppercase tracking-widest">
                 Daily Body Battery 🔋
               </h3>
-              {/* Save Button */}
               <button
                 onClick={handleSaveReadiness}
                 className="bg-blue-600 px-3 py-1 rounded text-xs font-bold hover:bg-blue-500 transition"
@@ -144,7 +144,7 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* Slider */}
+            {/* The Slider */}
             <input
               type="range"
               min="1"
@@ -154,13 +154,16 @@ export default function Dashboard() {
               className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer mb-4"
             />
 
-            {/* Dynamic Text Feedback */}
+            {/* Dynamic Feedback Area (This was missing!) */}
             <div className="flex justify-between items-end">
               <div>
+                {/* The Score Number */}
                 <div className="text-4xl font-bold text-white mb-1">
                   {readiness}{" "}
                   <span className="text-xl text-gray-500">/ 10</span>
                 </div>
+
+                {/* The Dynamic Text Advice */}
                 <p
                   className={`font-bold ${
                     readiness >= 8
@@ -178,7 +181,7 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* 3. ACTION BUTTONS (FIXED NESTING ERROR) */}

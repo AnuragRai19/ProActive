@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// 1. Import the API service
+import { api } from "../services/api";
+// 2. Import the new UI Component
+import Card from "../components/Card";
 
 export default function AICoach() {
   const [query, setQuery] = useState("");
@@ -14,12 +18,12 @@ export default function AICoach() {
     setLoading(true);
 
     try {
-      // Call your new Python Backend
-      const res = await fetch(`http://127.0.0.1:8000/ask_ai/${query}`);
-      const data = await res.json();
+      const data = await api.getAiAdvice(query);
 
       if (data.status === "Success") {
         setResponses(data.data);
+      } else {
+        console.warn("AI returned unexpected status:", data);
       }
     } catch (error) {
       console.error("Error asking AI:", error);
@@ -67,10 +71,7 @@ export default function AICoach() {
         {/* Results Area */}
         <div className="grid gap-6">
           {responses.map((item, index) => (
-            <div
-              key={index}
-              className="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg hover:border-blue-500 transition"
-            >
+            <Card key={index} className="hover:border-blue-500 transition">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="text-2xl font-bold text-white">{item.name}</h3>
                 <span
@@ -96,7 +97,7 @@ export default function AICoach() {
               <div className="bg-gray-900 p-4 rounded text-gray-300 leading-relaxed text-sm whitespace-pre-line">
                 {item.description.replace(/Exercise:.*\n/, "").trim()}
               </div>
-            </div>
+            </Card>
           ))}
 
           {responses.length === 0 && !loading && (
