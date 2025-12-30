@@ -75,25 +75,33 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Analytics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Card 1: Injury Risk (POWERED BY PYTHON) */}
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-            <h2 className="text-xl font-semibold mb-2">Injury Risk (ACWR)</h2>
-            <div className="text-4xl font-bold mb-2">{analytics.acwr}</div>
-            <p className={`text-lg ${getStatusColor(analytics.status)}`}>
-              {analytics.status}
-            </p>
-            <p className="text-gray-400 text-sm mt-2">
-              Acute Load: {analytics.acute_load} (Last 7 Days)
-            </p>
-          </div>
+        {/* Analytics Grid - Full Width & Symmetric */}
+        <div className="grid grid-cols-1 gap-6 mb-8">
+          {/* Card 1: Injury Risk (Full Width) */}
+          <div className="bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-700 text-center">
+            <h2 className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-4">
+              Injury Risk (ACWR)
+            </h2>
 
-          {/* Card 2: Quick Stats (Placeholder for now) */}
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-            <h2 className="text-xl font-semibold mb-2">Weekly Goal</h2>
-            <div className="text-4xl font-bold text-green-400">3 / 5</div>
-            <p className="text-gray-400">Workouts completed</p>
+            <div className="text-6xl font-extrabold text-white mb-4">
+              {analytics.acwr}
+            </div>
+
+            <div className="inline-block px-4 py-2 rounded-full border border-gray-600 bg-gray-900 mb-6">
+              <p
+                className={`text-lg font-bold ${getStatusColor(
+                  analytics.status
+                )}`}
+              >
+                {analytics.status}
+              </p>
+            </div>
+
+            <p className="text-gray-400 text-sm border-t border-gray-700 pt-4 w-1/2 mx-auto">
+              Acute Load:{" "}
+              <span className="text-white">{analytics.acute_load}</span> (Last 7
+              Days)
+            </p>
           </div>
         </div>
 
@@ -113,6 +121,15 @@ export default function Dashboard() {
           </button>
           <button className="p-4 bg-purple-600 rounded-lg hover:bg-purple-700 transition text-center font-semibold">
             Ask AI Coach
+            <button
+              onClick={() => navigate("/ai-coach")}
+              className="p-6 bg-linear-to-br from-purple-600 to-indigo-700 rounded-xl shadow-lg text-left hover:scale-105 transition"
+            >
+              <h2 className="text-2xl font-bold mb-2">🤖 AI Coach</h2>
+              <p className="opacity-90">
+                Get instant recovery advice & exercises
+              </p>
+            </button>
           </button>
         </div>
       </div>

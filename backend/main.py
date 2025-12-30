@@ -1,3 +1,4 @@
+from rag import get_ai_recommendation
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from database import supabase
@@ -41,3 +42,17 @@ def get_analytics(user_id: str):
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+# --- AI Coach Endpoint ---
+@app.get("/ask_ai/{query}")
+def ask_ai_coach(query: str):
+    try:
+        results = get_ai_recommendation(query)
+        
+        # If no results (unlikely), return a safe message
+        if not results:
+            return {"status": "No matches found", "data": []}
+            
+        return {"status": "Success", "data": results}
+    except Exception as e:
+        return {"status": "Error", "message": str(e)}
