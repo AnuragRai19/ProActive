@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,6 +7,13 @@ from pydantic import BaseModel
 from analytics import calculate_acwr
 from rag import get_ai_recommendation
 import database  
+
+# 2. Configure Logging (Global Setup)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -19,14 +27,14 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
+    logger.info("Health check endpoint called") 
     return {"message": "ProActive Backend is Running!"}
 
 # --- ANALYTICS ENDPOINT ---
 @app.get("/analytics/{user_id}")
 def get_analytics(user_id: str):
     try:
-        # 1. Fetch logs using the helper (Cleaner!)
-        # OLD: response = supabase.table("workout_logs")...
+        logger.info(f"Fetching analytics for user: {user_id}")
         logs = database.fetch_user_logs(user_id)
         
         # 2. Run the Math
@@ -35,6 +43,7 @@ def get_analytics(user_id: str):
         return stats
         
     except Exception as e:
+        logger.error(f"Analytics Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- AI COACH ENDPOINT ---
@@ -47,11 +56,14 @@ class AIRequest(BaseModel):
 @app.post("/ask")
 def ask_ai(request: AIRequest):
     try:
+        logger.info(f"AI Query received: {request.query}")
         results = get_ai_recommendation(request.query)
         if not results:
+            logger.warning(f"No AI results found for: {request.query}")
             return {"status": "No matches found", "data": []}
         return {"status": "Success", "data": results}
     except Exception as e:
+        logger.error(f"AI Brain Error: {e}")
         return {"status": "Error", "message": str(e)}
 
 # Keeping your original GET for backwards compatibility

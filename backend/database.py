@@ -1,6 +1,9 @@
 import os
+import logging
 from supabase import create_client, Client
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 # 1. Load the keys from the .env file
 load_dotenv()
@@ -10,10 +13,16 @@ key: str = os.environ.get("SUPABASE_KEY")
 
 # 2. Check if keys exist (Safety check)
 if not url or not key:
+    logger.critical("Supabase credentials missing in .env!")
     raise ValueError("Missing Supabase credentials in .env file")
 
 # 3. Create the connection
-supabase: Client = create_client(url, key)
+try:
+    supabase: Client = create_client(url, key)
+    logger.info("Connected to Supabase successfully") # <--- Success confirmation
+except Exception as e:
+    logger.critical(f"Failed to connect to Supabase: {e}")
+    raise e
 
 # --- NEW: HELPER FUNCTIONS (The "Data Layer") ---
 
@@ -28,7 +37,7 @@ def fetch_user_logs(user_id: str):
             .execute()
         return response.data
     except Exception as e:
-        print(f"Error fetching logs: {e}")
+        logger.error(f"DB Error (fetch_user_logs): {e}")
         return []
 
 def fetch_daily_checkins(user_id: str):
@@ -42,5 +51,5 @@ def fetch_daily_checkins(user_id: str):
             .execute()
         return response.data
     except Exception as e:
-        print(f"Error fetching checkins: {e}")
+        logger.error(f"DB Error (fetch_daily_checkins): {e}")
         return []

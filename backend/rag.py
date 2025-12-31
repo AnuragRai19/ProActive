@@ -1,10 +1,20 @@
+import logging  # <--- 1. Import Logging
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 
-# 1. Load the Database
-print("Loading AI Brain...")
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-vector_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+# 2. Setup Logger
+logger = logging.getLogger(__name__)
+
+# 3. Load the Database
+try:
+    logger.info("Loading AI Brain (FAISS)...")
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    vector_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+    logger.info("AI Brain loaded successfully.")
+except Exception as e:
+    logger.critical(f"Failed to load FAISS Index: {e}")
+    # We don't raise error here so the app doesn't crash, 
+    # but the AI endpoints will fail if called.
 
 # --- Knowledge Base for Advice ---
 INJURY_PREVENTION_TIPS = {
@@ -13,11 +23,12 @@ INJURY_PREVENTION_TIPS = {
     "shoulder": "⚠️ **Shoulder Safety:** Keep shoulders down (away from ears). Avoid flaring elbows wide.",
     "neck": "⚠️ **Neck Safety:** Keep your chin tucked. Don't crane your neck forward.",
     "wrist": "⚠️ **Wrist Safety:** Keep wrists neutral. Don't let them bend backward under load.",
-    "ankle": "⚠️ **Ankle Safety:** Wear supportive footwear. Avoid uneven surfaces if unstable. Strengthen calves to support the joint." # <--- ADDED ANKLE
+    "ankle": "⚠️ **Ankle Safety:** Wear supportive footwear. Avoid uneven surfaces if unstable. Strengthen calves to support the joint."
 }
 
 def get_ai_recommendation(query: str):
-    print(f"Thinking about: {query}")
+    logger.info(f"Thinking about: {query}") # <--- Changed print to logger.info
+    
     query_lower = query.lower()
     recommendations = []
     
@@ -26,10 +37,13 @@ def get_ai_recommendation(query: str):
         "pain", "hurt", "sore", "ache", "injury", "pull", "strain", 
         "tired", "fatigue", "sprain", "sprained", "tear", "torn", 
         "break", "broken", "stiff", "tight", "swollen", "swelling"
-    ] # <--- ADDED SPRAIN, TEAR, SWOLLEN, ETC.
+    ]
 
     is_pain_mode = any(word in query_lower for word in pain_keywords)
 
+    if is_pain_mode:
+        logger.warning(f"Pain detected in query: '{query}'. Activation Safety Protocols.") # <--- Log warning for pain
+    
     # --- STEP 2: Logic Layer (Advice) ---
     if is_pain_mode:
         # A. Add Medical Advice
@@ -42,7 +56,6 @@ def get_ai_recommendation(query: str):
         })
         
         # B. Modify the Search Query
-        # If user says "sprained ankle", we search for "ankle gentle rehab recovery"
         search_query = query + " gentle stretch recovery rehabilitation"
     else:
         # Normal search
@@ -60,26 +73,31 @@ def get_ai_recommendation(query: str):
             })
 
     # --- STEP 3: The Search & Filter ---
-    results = vector_db.similarity_search(search_query, k=5)
-    
-    for doc in results:
-        doc_type = doc.metadata.get('type', 'Unknown')
+    try:
+        results = vector_db.similarity_search(search_query, k=5)
         
-        # 🛑 THE FILTER LOGIC 🛑
-        # If user is in PAIN, SKIP "Strength" exercises
-        if is_pain_mode and doc_type == "Strength":
-            continue
+        for doc in results:
+            doc_type = doc.metadata.get('type', 'Unknown')
             
-        recommendations.append({
-            "name": doc.metadata['name'],
-            "type": doc.metadata['type'],
-            "muscle": doc.metadata['muscle'],
-            "equipment": doc.metadata['equipment'],
-            "description": doc.page_content
-        })
+            # 🛑 THE FILTER LOGIC 🛑
+            # If user is in PAIN, SKIP "Strength" exercises
+            if is_pain_mode and doc_type == "Strength":
+                continue
+                
+            recommendations.append({
+                "name": doc.metadata['name'],
+                "type": doc.metadata['type'],
+                "muscle": doc.metadata['muscle'],
+                "equipment": doc.metadata['equipment'],
+                "description": doc.page_content
+            })
+    except Exception as e:
+        logger.error(f"Error searching vector DB: {e}")
+        return [] # Return empty list on error
     
     # Fallback if filter removes everything
     if not recommendations:
+         logger.info("No safe exercises found. Returning fallback advice.")
          recommendations.append({
             "name": "Consult a Doctor",
             "type": "Medical Advice",
