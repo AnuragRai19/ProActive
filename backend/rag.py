@@ -1,4 +1,4 @@
-import logging  # <--- 1. Import Logging
+import logging  
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 
@@ -27,7 +27,7 @@ INJURY_PREVENTION_TIPS = {
 }
 
 def get_ai_recommendation(query: str):
-    logger.info(f"Thinking about: {query}") # <--- Changed print to logger.info
+    logger.info(f"Thinking about: {query}") 
     
     query_lower = query.lower()
     recommendations = []
@@ -42,7 +42,7 @@ def get_ai_recommendation(query: str):
     is_pain_mode = any(word in query_lower for word in pain_keywords)
 
     if is_pain_mode:
-        logger.warning(f"Pain detected in query: '{query}'. Activation Safety Protocols.") # <--- Log warning for pain
+        logger.warning(f"Pain detected in query: '{query}'. Activation Safety Protocols.") 
     
     # --- STEP 2: Logic Layer (Advice) ---
     if is_pain_mode:

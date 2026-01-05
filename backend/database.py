@@ -19,7 +19,7 @@ if not url or not key:
 # 3. Create the connection
 try:
     supabase: Client = create_client(url, key)
-    logger.info("Connected to Supabase successfully") # <--- Success confirmation
+    logger.info("Connected to Supabase successfully") 
 except Exception as e:
     logger.critical(f"Failed to connect to Supabase: {e}")
     raise e

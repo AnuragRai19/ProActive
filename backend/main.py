@@ -47,8 +47,6 @@ def get_analytics(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- AI COACH ENDPOINT ---
-# We added a POST method to support standard JSON bodies, 
-# but kept GET for testing/compatibility.
 
 class AIRequest(BaseModel):
     query: str
