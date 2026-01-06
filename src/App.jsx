@@ -3,7 +3,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import LogWorkout from "./pages/LogWorkout";
 import History from "./pages/History";
-import AICoach from "./pages/AICoach"; // <--- THIS WAS MISSING!
+import AICoach from "./pages/AICoach";
 
 function App() {
   return (
