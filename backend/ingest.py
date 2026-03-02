@@ -11,8 +11,8 @@ if not os.path.exists("gym_exercise_dataset.csv") or not os.path.exists("stretch
     print("❌ ERROR: CSV files not found!")
     exit()
 
-gym_df = pd.read_csv("gym_exercise_dataset.csv")
-stretch_df = pd.read_csv("stretch_exercise_dataset.csv")
+gym_df = pd.read_csv("data/gym_exercise_dataset.csv")
+stretch_df = pd.read_csv("data/stretch_exercise_dataset.csv")
 
 documents = []
 
