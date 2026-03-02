@@ -48,8 +48,6 @@ def calculate_acwr(logs):
     else:
         ratio = round(acute_load / chronic_avg, 2)
 
-    # ... (Previous imports and code remain the same)
-
     # 7. Determine Status
     if ratio == 0:
         status = "No Recent Training"
