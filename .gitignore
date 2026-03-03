@@ -31,3 +31,22 @@ backend/venv/
 
 # Frontend / Root ignores
 .env
+
+# Vector Database (FAISS) 
+# These local binary files shouldn't be shared on GitHub.
+*.faiss
+*.pkl
+
+# AI & Python cache
+.ipynb_checkpoints/
+.pytest_cache/
+.python-version
+
+# Local Environment Overrides (Vite/Node)
+.env.production
+.env.local
+.env.development.local
+
+# Database temporary files
+*.sqlite
+*.db
