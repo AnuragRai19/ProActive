@@ -1,12 +1,7 @@
 // src/services/api.js
 
-// 1. Define the Backend URL once
-// We check if an Environment Variable exists (for production), otherwise use Localhost
 const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
-/**
- * Helper to handle API responses and errors
- */
 const handleResponse = async (response) => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -15,20 +10,17 @@ const handleResponse = async (response) => {
   return response.json();
 };
 
-// --- API FUNCTIONS ---
-
 export const api = {
-  /**
-   * Fetch Dashboard Analytics (ACWR, Acute Load, Status)
-   */
+  getAIAnalysis: async (userId) => {
+    const response = await fetch(`${BASE_URL}/api/coach/analyze/${userId}`);
+    return handleResponse(response);
+  },
+
   getAnalytics: async (userId) => {
     const response = await fetch(`${BASE_URL}/analytics/${userId}`);
     return handleResponse(response);
   },
 
-  /**
-   * Fetch AI Coach Advice (RAG)
-   */
   getAiAdvice: async (query) => {
     const response = await fetch(`${BASE_URL}/ask`, {
       method: "POST",
@@ -38,9 +30,6 @@ export const api = {
     return handleResponse(response);
   },
 
-  /**
-   * (Optional) Health Check to see if backend is running
-   */
   checkHealth: async () => {
     const response = await fetch(`${BASE_URL}/`);
     return handleResponse(response);
