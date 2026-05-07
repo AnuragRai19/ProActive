@@ -1,5 +1,6 @@
 import logging
 import os
+import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Depends # Added Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -22,7 +23,7 @@ coach = GeminiCoach()
 # 2. CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -118,3 +119,8 @@ def get_analytics(user_id: str, token_id: str = Depends(get_authenticated_user))
     except Exception as e:
         logger.error(f"Analytics Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+    # --- Server Startup ---
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
