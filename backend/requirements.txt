@@ -13,3 +13,4 @@ google-genai==0.3.0
 faiss-cpu>=1.8.0         
 numpy>=1.26.0            
 python-multipart>=0.0.9  
+sentence-transformers
