@@ -1,18 +1,16 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.1+cpu
-torchvision==0.17.1+cpu
-sentence-transformers==2.6.1
-fastapi==0.111.0
-langchain_community==0.2.1
-langchain_core==0.2.1
-langchain_huggingface==0.0.1
-pandas==2.2.2
-protobuf==4.25.3
-pydantic==2.7.1
-python-dotenv==1.0.1
-supabase==2.4.5
-uvicorn==0.29.0
-google-genai==0.3.0
-faiss-cpu==1.8.0
-numpy==1.26.4
-python-multipart==0.0.9
+torch --index-url https://download.pytorch.org/whl/cpu
+sentence-transformers
+fastapi
+langchain_community
+langchain_core
+langchain_huggingface
+pandas
+pydantic
+python-dotenv
+supabase
+uvicorn
+google-genai
+faiss-cpu
+numpy
+python-multipart
