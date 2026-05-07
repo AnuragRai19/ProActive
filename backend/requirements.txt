@@ -1,10 +1,10 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch --index-url https://download.pytorch.org/whl/cpu
+torch==2.2.1+cpu
 sentence-transformers
 fastapi
-langchain_community
-langchain_core
-langchain_huggingface
+langchain-huggingface
+langchain-community
+langchain
 pandas
 pydantic
 python-dotenv

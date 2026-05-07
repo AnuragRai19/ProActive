@@ -7,7 +7,7 @@ import os
 # 1. Load Data
 print("Loading datasets...")
 
-if not os.path.exists("gym_exercise_dataset.csv") or not os.path.exists("stretch_exercise_dataset.csv"):
+if not os.path.exists("data/gym_exercise_dataset.csv") or not os.path.exists("data/stretch_exercise_dataset.csv"):
     print("❌ ERROR: CSV files not found!")
     exit()
 
